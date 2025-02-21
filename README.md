@@ -28,7 +28,9 @@
 - 
 
 ## 計算手法はフォルダ内の以下を参照
-Dynamical_Systems_Theory_in_CR3BP.pptx
+Dynamical_Systems_Theory_in_CR3BP.pdf
+※このpdfは現在、MATLABのコードで説明されたものをアップロードしています。修正し次第、Juliaのものに変更します。
+※サイズの影響でpdfファイルしかアップロードできませんでした。
 
 ## 環境構築　(Windowsの場合)
 1. Juliaのインストール
