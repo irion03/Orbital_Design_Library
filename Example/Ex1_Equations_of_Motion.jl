@@ -67,11 +67,11 @@ t_n_CR3BP = 3.467622949281189
 x_n_CR3BP = [1.102866098413080, 0.0, 0.0, 0.0, 0.259155907029058, 0.0]
 
 # Specification Parameter 
-parameter = (mu_EM)
+parameter1 = (mu_EM)
 # Specification Integration Time 
 tspan1 = (0.0, t_n_CR3BP)
 # Setup ODE Problem 
-prob = ODEProblem(fun_cr3bp!, x_n_CR3BP, tspan1, mu_EM)
+prob = ODEProblem(fun_cr3bp!, x_n_CR3BP, tspan1, parameter1)
 # ODE Solver Execution
 sol = solve(prob, Vern7(), abstol=1e-14, reltol=1e-14)
 
@@ -92,3 +92,57 @@ fig[1, 2] = legend
 
 # Display the Figure
 fig
+
+"""trajectory in Earth-Moon ER3BP"""
+# Orbital Period of ER3BP
+t_ER3BP = t_n_CR3BP * chara_time_CR3BP * N_ER3BP
+# transfomation from CR3BP reference frame to the inertial frame
+X0_CR3BP = [x_n_CR3BP[1:3] .* chara_length_CR3BP; x_n_CR3BP[4:6] .* chara_length_CR3BP ./ chara_time_CR3BP]
+C_CR3BP = [cos(0.0) -sin(0.0) 0.0;
+           sin(0.0)  cos(0.0) 0.0;
+                0.0       0.0 1.0]
+dtheta_dt_CR3BP = N_CR3BP
+# constructs a transformation matrix of CR3BP
+rotating_matrix_CR3BP = fun_rotating_to_inertial_matrix(C_CR3BP, dtheta_dt_CR3BP)
+# Convert the initial state vector X0_CR3BP expressed in the rotating frame of CR3BP to the inertial frame
+X0_inertial = rotating_matrix_CR3BP * X0_CR3BP
+
+# Transformation from inertial frame to ER3BP
+C_ER3BP = [cos(0.0) -sin(0.0) 0.0;
+           sin(0.0)  cos(0.0) 0.0;
+                0.0       0.0 1.0]
+# Calculation of angular velocity of ER3BP
+dtheta_dt_ER3BP = sqrt(G * (M1 + M2) * (1 + e * cos(0.0))^4 / (a * (1 - e^2))^3)
+# constructs a transformation matrix of ER3BP
+rotating_matrix_ER3BP = fun_rotating_to_inertial_matrix(C_ER3BP, dtheta_dt_ER3BP)
+# Convert the initial state vector X0_inertial expressed in the inertial frame to the rotating frame of ER3BP
+X0_ER3BP = rotating_matrix_ER3BP \ X0_inertial # (inv(rotating_matrix_ER3BP)*X0_inertialと同じ意味)
+x0_ER3BP = [X0_ER3BP[1:3] ./ (a * (1 - e)); X0_ER3BP[4:6] ./ (a * (1 - e)) ./ N_ER3BP] # 同じものを二回定義しているけど、後者を採用？
+
+# Specification Parameter 
+parameter2 = (mu_EM, e)
+# Solve ODE in ER3BP
+tspan2 = (0.0, t_ER3BP)
+# Setup ODE Problem 
+prob2 = ODEProblem(fun_er3bp!, x0_ER3BP, tspan2, parameter2)
+# ODE Solver Execution
+sol2 = solve(prob2, Vern7(), abstol=1e-14, reltol=1e-14)
+
+# Visualization using GLMakie
+fig2 = Figure(size = (800, 600))
+ax2 = Axis(fig2[1, 1], title = "Trajectory in Earth-Moon ER3BP",
+    xlabel = "x [-]", ylabel = "y [-]", aspect = DataAspect())
+
+scatter!(ax2, [1 - mu_EM], [0.0], color = "#EDB120", markersize = 20, label = "Moon")
+scatter!(ax2, [sol2[1, 1]], [sol2[2, 1]], color = "#0072BD", markersize = 10, label = "Initial Position")
+lines!(ax2, sol2[1, :], sol2[2, :], color = "#0072BD", linewidth = 2, label = "Trajectory")
+
+legend2 = Legend(fig2, ax2, "Legend", orientation = :vertical)
+fig2[1, 2] = legend2
+
+# Save figure
+f2_name = "Ex1_ER3BP_x0=$(x0_ER3BP[1])_vy0=$(x0_ER3BP[5])_t=$(t_ER3BP)"
+f2_name = replace(f2_name, "." => ",")
+save("$(f2_name).png", fig2)
+
+fig2
