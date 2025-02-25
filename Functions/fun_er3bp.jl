@@ -3,7 +3,7 @@ function fun_er3bp!(dx, x, parameter, t)
     This function calculates the derivatives of position and velocity for an object under the influence of two primary bodies
     in the ER3BP framework. The results are stored directly in the `dx` array to avoid memory allocation.
     """
-
+    
     # Parameter unpacking 
     mu = parameter[1]
     e = parameter[2]

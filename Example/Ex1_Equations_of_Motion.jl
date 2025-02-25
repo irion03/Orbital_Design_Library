@@ -66,20 +66,12 @@ thetaM0 = 0
 t_n_CR3BP = 3.467622949281189
 x_n_CR3BP = [1.102866098413080, 0.0, 0.0, 0.0, 0.259155907029058, 0.0]
 
-# Specification Parameter 
-<<<<<<< HEAD
+# Specification Parameter
 parameter1 = (mu_EM)
 # Specification Integration Time 
 tspan1 = (0.0, t_n_CR3BP)
-# Setup ODE Problem 
+# Setup ODE Problem
 prob = ODEProblem(fun_cr3bp!, x_n_CR3BP, tspan1, parameter1)
-=======
-parameter = (mu_EM)
-# Specification Integration Time 
-tspan1 = (0.0, t_n_CR3BP)
-# Setup ODE Problem 
-prob = ODEProblem(fun_cr3bp!, x_n_CR3BP, tspan1, mu_EM)
->>>>>>> 748834e2ef04e45bd3c365491093c08a43a6640e
 # ODE Solver Execution
 sol = solve(prob, Vern7(), abstol=1e-14, reltol=1e-14)
 
@@ -99,7 +91,6 @@ legend = Legend(fig, ax, "Legend", orientation = :vertical)
 fig[1, 2] = legend
 
 # Display the Figure
-<<<<<<< HEAD
 fig
 
 """trajectory in Earth-Moon ER3BP"""
@@ -155,6 +146,4 @@ f2_name = replace(f2_name, "." => ",")
 save("$(f2_name).png", fig2)
 
 fig2
-=======
-fig
->>>>>>> 748834e2ef04e45bd3c365491093c08a43a6640e
+
