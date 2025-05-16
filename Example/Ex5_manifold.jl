@@ -7,12 +7,13 @@ using LinearAlgebra
 using GLMakie
 using Polynomials
 using Printf
+
 GLMakie.activate!()
 # Function loading
 current_dir = pwd()
 
 # Function loading
-functions_dir = normpath(joinpath(current_dir, ".", "Functions"))
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -29,6 +30,13 @@ else
     println("Error: Functions directory not found at ", functions_dir)
 end
 
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_dir = "../Example/Figure/"
+
 # Retrieving Parameters for the Sun-Earth Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
 # Calculation of Lagrange points
@@ -36,7 +44,7 @@ L1, L2, L3, L4, L5 = fun_libration_points(mu)
 
 # Initial conditions for Lyapunov orbit
 x0 = [0.9889 0 0 0 0.008375 0]'
-x0 = [0.9919 0 0.002223 0 -0.01014 0]'
+#x0 = [0.9919 0 0.002223 0 -0.01014 0]'
 t0 = 2
 
 if x0[3] == 0
@@ -46,6 +54,7 @@ else
 end
 
 """differential_correction"""
+# Parameter setting
 parameter = (mu)
 # Define ODE Problem
 tspan = (0.0, 2 * t0)
@@ -120,23 +129,19 @@ tf = 4.8
 tspan_s = (tf, 0)
 tspan_u = (0, tf)
 
-# Save directory
-save_dir = "./Example/Figure/"
-
 fig = Figure(size=(800, 600))
-if Lyapunov 
-    ax = Axis3(fig[1,1], xlabel=L"x\mathrm{[-]}", ylabel=L"y\mathrm{[-]}", zlabel=L"z\mathrm{[-]}", azimuth = -pi/2, elevation = pi/2)
-    ax.zlabelvisible = false
-    ax.zticklabelsvisible = false
-  else
-    ax = Axis3(fig[1,1], xlabel=L"x\mathrm{[-]}", ylabel=L"y\mathrm{[-]}", zlabel=L"z\mathrm{[-]}", azimuth = pi/9, elevation = pi/6)
+if Lyapunov
+    ax = Axis(fig[1, 1], xlabel="x[-]", ylabel="y[-]",
+        xlabelfont=font, ylabelfont=font,
+        xticklabelfont=font, yticklabelfont=font
+    )
+else
+    ax = Axis3(fig[1, 1], xlabel="x[-]", ylabel="y[-]", zlabel=L"z[-]",
+        azimuth=pi/9, elevation=pi/6,
+        xlabelfont=font, ylabelfont=font, zlabelfont=font,
+        xticklabelfont=font, yticklabelfont=font, zticklabelfont=font
+    )
 end
-
-#=
-# Zero velocity curve
-contourf!(ax, x_range, y_range, C; levels=[minimum(C), C_xn], colormap=[:gray])
-contour!(ax, x_range, y_range, C; levels=[C_xn], linewidth=1.5, color=:black)
-=#
 
 # Stable manifolds
 f1_p1 = []
@@ -144,13 +149,21 @@ f1_p2 = []
 for i in 1:N
     prob_ys_left = ODEProblem(fun_cr3bp!, XS_left[:, i], (tspan_s[1], tspan_s[end]), parameter)
     sol_ys_left = solve(prob_ys_left, Vern7(), abstol=1e-14, reltol=1e-14)
-    push!(f1_p1, lines!(ax, sol_ys_left[1,:], sol_ys_left[2,:], sol_ys_left[3,:], color=:green))
+    if Lyapunov
+        push!(f1_p1, lines!(ax, sol_ys_left[1, :], sol_ys_left[2, :], color=:green))
+    else
+        push!(f1_p1, lines!(ax, sol_ys_left[1, :], sol_ys_left[2, :], sol_ys_left[3, :], color=:green))
+    end
 end
 
 for i in 1:N
     prob_ys_right = ODEProblem(fun_cr3bp!, XS_right[:, i], (tspan_s[1], tspan_s[end]), parameter)
     sol_ys_right = solve(prob_ys_right, Vern7(), abstol=1e-14, reltol=1e-14)
-    push!(f1_p2, lines!(ax, sol_ys_right[1,:], sol_ys_right[2,:], sol_ys_right[3,:], color=:blue))
+    if Lyapunov
+        push!(f1_p2, lines!(ax, sol_ys_right[1,:], sol_ys_right[2,:], color=:blue))
+    else
+        push!(f1_p2, lines!(ax, sol_ys_right[1,:], sol_ys_right[2,:], sol_ys_right[3,:], color=:blue))
+    end
 end
 
 # Unstable manifolds
@@ -159,30 +172,41 @@ f1_p4 = []
 for i in 1:N
     prob_yu_left = ODEProblem(fun_cr3bp!, XU_left[:, i], (tspan_u[1], tspan_u[end]), parameter)
     sol_yu_left = solve(prob_yu_left, Vern7(), abstol=1e-14, reltol=1e-14)
-    push!(f1_p3, lines!(ax, sol_yu_left[1,:], sol_yu_left[2,:], sol_yu_left[3,:], color=:magenta))
+    if Lyapunov
+        push!(f1_p3, lines!(ax, sol_yu_left[1,:], sol_yu_left[2,:], color=:magenta))
+    else
+        push!(f1_p3, lines!(ax, sol_yu_left[1,:], sol_yu_left[2,:], sol_yu_left[3,:], color=:magenta))
+    end
 end
 
 for i in 1:N
     prob_yu_right = ODEProblem(fun_cr3bp!, XU_right[:, i], (tspan_u[1], tspan_u[end]), parameter)
     sol_yu_right = solve(prob_yu_right, Vern7(), abstol=1e-14, reltol=1e-14)
-    push!(f1_p4, lines!(ax, sol_yu_right[1,:], sol_yu_right[2,:], sol_yu_right[3,:], color=:red))
+    if Lyapunov
+        push!(f1_p4, lines!(ax, sol_yu_right[1,:], sol_yu_right[2,:], color=:red))
+    else
+        push!(f1_p4, lines!(ax, sol_yu_right[1,:], sol_yu_right[2,:], sol_yu_right[3,:], color=:red))
+    end
 end
 
 # Legend
-Legend(fig[1, 2], [
-    f1_p1[1], 
-    f1_p2[1],  
-    f1_p3[1],  
-    f1_p4[1]   
-], ["left half of stable manifold", "right half of stable manifold", "left half of unstable manifold", "right half of unstable manifold"])
+Legend(fig[1, 2], [f1_p1[1], f1_p2[1], f1_p3[1], f1_p4[1]], 
+["left half of stable manifold", "right half of stable manifold", "left half of unstable manifold", "right half of unstable manifold"]
+, labelfont = font)
 
 # Plot corrected trajectory and L1 point
-GLMakie.lines!(ax, sol[1,:], sol[2,:], sol[3,:], color=:black)
-GLMakie.scatter!(ax, [L1[1]], [L1[2]], [L1[3]], markersize=10, color=:black)
-
-xlims!(ax, 0.96, 1.02)
-ylims!(ax, -0.02, 0.02)
-zlims!(ax, -0.02, 0.02)
+if Lyapunov
+    lines!(ax, sol[1, :], sol[2, :], color=:black)
+    GLMakie.scatter!(ax, [L1[1]], [L1[2]], markersize=10, color=:black)
+    xlims!(ax, 0.96, 1.02)
+    ylims!(ax, -0.02, 0.02)
+else
+    lines!(ax, sol[1, :], sol[2, :], sol[3, :], color=:black)
+    GLMakie.scatter!(ax, [L1[1]], [L1[2]], [L1[3]], markersize=10, color=:black)
+    xlims!(ax, 0.96, 1.02)
+    ylims!(ax, -0.02, 0.02)
+    zlims!(ax, -0.02, 0.02)
+end
 
 # Save figure
 f1_name = "Ex5_manifold_mu=$(mu)_xn=$(x_n[1])_zn=$(x_n[3])_ydotn=$(x_n[5])_tn=$(t_n)_xpert=$(xpert)_tf=$(tf)"
@@ -190,7 +214,7 @@ f1_name = replace(f1_name, "." => ",")
 
 if Lyapunov 
     # Zero velocity curve
-    contourf!(ax, x_range, y_range, C; levels=[minimum(C), C_xn], colormap=[:gray], extend=:neither)
+    contourf!(ax, x_range, y_range, C; levels=[minimum(C), C_xn], colormap=[:gray])
     contour!(ax, x_range, y_range, C; levels=[C_xn], linewidth=1.5, color=:black)
     save_path = joinpath(save_dir, f1_name * ".png")
     save(save_path, fig)
