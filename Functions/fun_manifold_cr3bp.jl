@@ -15,7 +15,7 @@ function fun_manifold_cr3bp(mu, x0, t0, N, xpert)
 
     # Solve ODE
     prob = ODEProblem(fun_stm_cr3bp!, X0, (0.0, t0), parameter)
-    sol = solve(prob, Vern7(), saveat=tspan)
+    sol = solve(prob, Vern7(), saveat=tspan, abstol=3e-14, reltol=1e-14)
     
     # Extract final monodromy matrix
     M = reshape(sol[end][7:42], 6, 6)

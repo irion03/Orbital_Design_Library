@@ -1,6 +1,6 @@
 using DataFrames, CSV
 
-function fun_save_data(data_t, data_u, save_file_name)
+function fun_save_data(data_t, data_u, save_dir, save_file_name)
     # Convert sol.u (Vector of Vectors) to Matrix if needed
     if eltype(data_u) <: AbstractVector  # e.g., Vector{Vector{Float64}}
         data_u_mat = hcat(data_u...)'  # Convert to Matrix: (N × dim)
@@ -28,6 +28,6 @@ function fun_save_data(data_t, data_u, save_file_name)
     safe_name = replace(save_file_name, "," => "_")
 
     # Write to .dat file (CSV format)
-    CSV.write(joinpath("./Example/Output_data/"*save_file_name*".dat"), df)
+    CSV.write(joinpath(save_dir*save_file_name*".dat"), df)
 end
 

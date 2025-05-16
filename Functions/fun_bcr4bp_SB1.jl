@@ -39,7 +39,7 @@ function fun_bcr4bp_SB1!(dx, x, parameter, t)
     dx[1] = x[4]
     dx[2] = x[5]
     dx[3] = x[6]
-    dx[4] = 2 * x[5]    + x[1]  - (1 - mu_SB1) * (x[1] + mu_SB1) / r_s^3    - mu_SB1 * (1 - mu_EM) * (x[1] - r_E[1]) / r1^3     - mu_SB1 * mu_EM * (x[1] - r_M[1]) / r2^3
+    dx[4] =  2 * x[5]   + x[1]  - (1 - mu_SB1) * (x[1] + mu_SB1) / r_s^3    - mu_SB1 * (1 - mu_EM) * (x[1] - r_E[1]) / r1^3     - mu_SB1 * mu_EM * (x[1] - r_M[1]) / r2^3
     dx[5] = -2 * x[4]   + x[2]  - (1 - mu_SB1) * x[2] / r_s^3               - mu_SB1 * (1 - mu_EM) * (x[2] - r_E[2]) / r1^3     - mu_SB1 * mu_EM * (x[2] - r_M[2]) / r2^3
     dx[6] =                     - (1 - mu_SB1) * x[3] / r_s^3               - mu_SB1 * (1 - mu_EM) * (x[3] - r_E[3]) / r1^3     - mu_SB1 * mu_EM * (x[3] - r_M[3]) / r2^3
 
