@@ -11,7 +11,7 @@ using Printf
 current_dir = pwd()
 
 # Function loading
-functions_dir = normpath(joinpath(current_dir, ".", "Functions"))
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -28,6 +28,12 @@ else
     println("Error: Functions directory not found at ", functions_dir)
 end
 
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_dir = "../Example/Figure/"
 
 # Retrieving Parameters for the Earth-moon Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
@@ -187,11 +193,11 @@ for i in 1:iteration_MS_max
     X0 = X_n
 end
 
-# Save directory
-save_dir = "./Example/Figure/"
-
 fig1 = Figure(size = (800, 600))
-ax = Axis(fig1[1,1], xlabel=L"x\mathrm{[-]}", ylabel=L"y\mathrm{[-]}")
+ax = Axis(fig1[1,1], xlabel="x [-]", ylabel="y [-]",
+        xlabelfont=font, ylabelfont=font,
+        xticklabelfont=font, yticklabelfont=font
+    )
 
 # Lyapunov orbits around L1 and L2
 GLMakie.lines!(ax, sol_L1[1, :], sol_L1[2, :], color=:black, linestyle=:dot)
@@ -205,8 +211,7 @@ GLMakie.scatter!(ax, [L2[1]], [L2[2]], [L2[3]], color=:black, marker=:star6, mar
 initial_guess1 = lines!(ax, sol1[1, :], sol1[2, :], color=:blue)
 initial_guess2 = lines!(ax, sol2[1, :], sol2[2, :], color=:blue)
 
-Legend(fig1[1, 2], [[initial_guess1]], 
-    ["Initial guess"])
+Legend(fig1[1, 2], [[initial_guess1]], ["Initial guess"], labelfont = font)
 
 f1_name = "Ex6_initial_guess_mu=$(mu)"
 f1_name = replace(f1_name, "." => ",") 
@@ -214,9 +219,12 @@ save_path = joinpath(save_dir, f1_name * ".png")
 save(save_path, fig1)
 
 fig2 = Figure(size = (800, 600))
-ax = Axis(fig2[1,1], xlabel=L"x\mathrm{[km]}", ylabel=L"y\mathrm{[km]}")
+ax = Axis(fig2[1,1], xlabel="x[km]", ylabel="y[km]",
+        xlabelfont=font, ylabelfont=font,
+        xticklabelfont=font, yticklabelfont=font
+    )
 
-# L1,L2のリアプノフ軌道
+# Lyapunov Orbits around L1 and L2
 GLMakie.lines!(ax, sol_L1[1, :], sol_L1[2, :], color=:black, linestyle=:dot)
 GLMakie.lines!(ax, sol_L2[1, :], sol_L2[2, :], color=:black, linestyle=:dot)
 
@@ -237,12 +245,12 @@ for i = 1:(n-1)
     GLMakie.scatter!(ax, [sol[1,end]], [sol[2,end]], color = "#D95319", markersize = 10)
 end
 
-# 初期解
+# Initial guess 
 initial_guess1 = lines!(ax, sol1[1, :], sol1[2, :], color=:blue)
 initial_guess2 = lines!(ax, sol2[1, :], sol2[2, :], color=:blue)
 
 Legend(fig2[1, 2], [[initial_guess1], [multiple_shooting_plots[1]]], 
-    ["Initial guess","Multiple shooting"])
+    ["Initial guess","Multiple shooting"], labelfont = font)
 
 f2_name = "Ex6_multiple_shooting_mu=$(mu)"
 f2_name = replace(f2_name, "." => ",") 
