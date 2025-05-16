@@ -8,7 +8,9 @@ using GLMakie
 using Polynomials
 
 # Function loading
-functions_dir = normpath(joinpath(current_dir, ".", "Functions"))
+current_dir = pwd()
+
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -25,62 +27,12 @@ else
     println("Error: Functions directory not found at ", functions_dir)
 end
 
-# Compute stable and unstable manifolds
-function compute_manifolds(L, mu, tf)
-    sigma = (1 - mu) / abs(L[1] + mu)^3 + mu / abs(L[1] - 1 + mu)^3
-    A = [0 0 0 1 0 0;
-         0 0 0 0 1 0;
-         0 0 0 0 0 1;
-         2 * sigma + 1 0 0 0 2 0;
-         0 1 - sigma 0 -2 0 0;
-         0 0 -sigma 0 0 0]
-
-    # Obtain eigenvalues and eigenvectors (Note the order: In MATLAB, `eig(A)` returns `[V, D] = eig(A)`. But in Julia, `D, V = eigen(A)`, where `D` is output as an array.)
-    D, V = eigen(A)
-
-    # 
-    Vs = zeros(6) 
-    Vu = zeros(6) 
-
-    for i in 1:6
-        # eigenvalues
-        λ = D[i]
-        # Extract only real eigenvalues
-        if imag(λ) == 0 && real(λ) != 0
-            if real(λ) < 0
-                # Add eigenvectors corresponding to negative eigenvalues (Convert ComplexF64 → Float64)
-                Vs = real(V[:, i])  
-            elseif real(λ) > 0
-                # Add eigenvectors corresponding to positive eigenvalues (Convert ComplexF64 → Float64)
-                Vu = real(V[:, i])  
-            end
-        end
-    end
-
-    #
-    x0_sp = vcat(L, zeros(3)) + 1e-10 * Vs / norm(Vs)
-    x0_sm = vcat(L, zeros(3)) - 1e-10 * Vs / norm(Vs)
-    x0_up = vcat(L, zeros(3)) + 1e-10 * Vu / norm(Vu)
-    x0_um = vcat(L, zeros(3)) - 1e-10 * Vu / norm(Vu)
-
-    # Specification integration time 
-    tspan_s = (tf, 0)
-    tspan_u = (0, tf)
-
-    # Definition of ODEProblem
-    prob_sp = ODEProblem(fun_cr3bp!, x0_sp, tspan_s, mu)
-    prob_sm = ODEProblem(fun_cr3bp!, x0_sm, tspan_s, mu)
-    prob_up = ODEProblem(fun_cr3bp!, x0_up, tspan_u, mu)
-    prob_um = ODEProblem(fun_cr3bp!, x0_um, tspan_u, mu)
-
-    # Execution of the ODE Solver
-    sol_sp = solve(prob_sp, Vern7(), abstol=1e-14, reltol=1e-14)
-    sol_sm = solve(prob_sm, Vern7(), abstol=1e-14, reltol=1e-14)
-    sol_up = solve(prob_up, Vern7(), abstol=1e-14, reltol=1e-14)
-    sol_um = solve(prob_um, Vern7(), abstol=1e-14, reltol=1e-14)
-
-    return sol_sp, sol_sm, sol_up, sol_um
-end
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_dir = "../Example/Figure/"
 
 """Zero_velocity_curve"""
 # Retrieving Parameters for the Earth-Moon Circular Restricted Three-Body Problem
@@ -103,17 +55,14 @@ C = 2 .* U
 
 """manifolds"""
 tf1, tf2, tf3 = 15.0, 25.0, 145.0
-sol_sp_L1, sol_sm_L1, sol_up_L1, sol_um_L1 = compute_manifolds(L1, mu, tf1)
-sol_sp_L2, sol_sm_L2, sol_up_L2, sol_um_L2 = compute_manifolds(L2, mu, tf2)
-sol_sp_L3, sol_sm_L3, sol_up_L3, sol_um_L3 = compute_manifolds(L3, mu, tf3)
+sol_sp_L1, sol_sm_L1, sol_up_L1, sol_um_L1 = fun_compute_manifolds(L1, mu, tf1)
+sol_sp_L2, sol_sm_L2, sol_up_L2, sol_um_L2 = fun_compute_manifolds(L2, mu, tf2)
+sol_sp_L3, sol_sm_L3, sol_up_L3, sol_um_L3 = fun_compute_manifolds(L3, mu, tf3)
 
 # Lagrange Points and Their Corresponding Jacobi Constants
 C1 = fun_Jacobi_const(vcat(L1, [0.0, 0.0, 0.0]), mu)
 C2 = fun_Jacobi_const(vcat(L2, [0.0, 0.0, 0.0]), mu)
 C3 = fun_Jacobi_const(vcat(L3, [0.0, 0.0, 0.0]), mu)
-
-# Save directory
-save_dir = "./Example/Figure/"
 
 # Generate each figure
 for (Li, sol_sp, sol_sm, sol_up, sol_um, Ci, tf, label) in 
@@ -122,9 +71,14 @@ for (Li, sol_sp, sol_sm, sol_up, sol_um, Ci, tf, label) in
         [C1, C2, C3], [tf1, tf2, tf3], ["L1", "L2", "L3"])
 
     local fig = Figure(size=(800, 600))
-    local ax = Axis(fig[1, 1], aspect = DataAspect(), xlabel = L"x\mathrm{[-]}", ylabel = L"y\mathrm{[-]}",
+    local ax = Axis(fig[1, 1], aspect = DataAspect(), xlabel = "x [-]", ylabel = "y [-]",
         xlabelsize = 16, ylabelsize = 16,
-        xticklabelsize = 16, yticklabelsize = 16)
+        xticklabelsize = 16, yticklabelsize = 16,
+        xlabelfont = font,
+        ylabelfont = font,
+        xticklabelfont = font,
+        yticklabelfont = font
+    )
 
     p_primary = scatter!(ax, [-mu, 1 - mu], [0, 0], color = :black, markersize = 15)
 
@@ -155,7 +109,8 @@ for (Li, sol_sp, sol_sm, sol_up, sol_um, Ci, tf, label) in
             "Zero-velocity curve",
             "Lagrange points",
             "Target L-point"
-        ])
+        ], 
+        labelfont = font)
 
     # Save the figure
     local save_file_name = "Ex3_manifold_of_$(label)_mu=$(mu)_C=$(Ci)_tf=$(tf)"
@@ -164,8 +119,8 @@ for (Li, sol_sp, sol_sm, sol_up, sol_um, Ci, tf, label) in
     save(save_path, fig)
 
     # Save trajectory data
-    fun_save_data(sol_sp.t, sol_sp.u, save_file_name * "_stable_plus")
-    fun_save_data(sol_sm.t, sol_sm.u, save_file_name * "_stable_minus")
+    fun_save_data(sol_sp.t, sol_sp.u, save_dir, save_file_name * "_stable_plus")
+    fun_save_data(sol_sm.t, sol_sm.u, save_dir, save_file_name * "_stable_minus")
 
     display(fig)
 end
