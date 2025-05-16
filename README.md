@@ -42,44 +42,46 @@ Microsoft StoreからJuliaをインストールする。または、[Julia公式
 - CSVのインストール（CSVファイルの読み書きを行うライブラリ）
   
 ```add CSV```
+
 - DataFramesのインストール（データを表形式で操作するためのライブラリ）
-- 
+
 ```add DataFrames```
 - DifferentialEquationsのインストール（常微分方程式などを数値的に解くライブラリ）
-- 
+
 ```add DifferentialEquations```
 
 - StaticArraysのインストール（高速な固定サイズ配列を提供するライブラリ）
-- 
+
 ```add StaticArrays```
 
 - LinearAlgebraのインストール（線形代数計算用の標準ライブラリ）
-- 
+
 ```add LinearAlgebra```
 
 - GLMakieのインストール（インタラクティブで高速な可視化を行うためのライブラリ）
-- 
+
 ```add GLMakie```
 
 - CairoMakieのインストール（高品質なベクター出力を含むMakieバックエンド）
-- 
+
 ```add CairoMakie```
 
 - Polynomialsのインストール（多項式の定義と演算をサポート）
-- 
+
 ```add Polynomials```
 
 - Printfのインストール（フォーマット付き文字列出力）
-- 
+
 ```add Printf```
 
 - Interpolationsのインストール（補間処理用のライブラリ）
-- 
+
 ```add Interpolations```
 
 - ColorSchemesのインストール（色スキームの管理と可視化用）
-```add ColorSchemes```
+
 ```add ColorSchemes```
 
 - Colorsのインストール（色の操作と変換を行うライブラリ）
+
 ```add Colors```
