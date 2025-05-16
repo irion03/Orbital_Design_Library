@@ -4,14 +4,11 @@ Ex1_Equations_of_Motion.jl
 
 using LinearAlgebra
 using DifferentialEquations
-using GLMakie #ファンクションを作って、同じ形式で出力できるようにする。図の形式で題名を消す、軸の名前をイタリックに
+using GLMakie 
 
-# .datを読み込んで履歴を出力。gunplotを使うので
-
-# 現在の作業ディレクトリを取得
 current_dir = pwd()
 
-functions_dir = normpath(joinpath(current_dir, ".", "Functions"))
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -30,8 +27,12 @@ end
 
 # Start of script
 # closeall() # Close all figures
-
-t0 = time()  # Start timer
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_dir = "../Example/Figure/"
 
 """Initial conditions and constants"""
 # Mass of Sun [kg]
@@ -43,19 +44,19 @@ M2 = 7.346e22
 # Gravitational constant [m^3/(kg*s^2)]
 G = 6.673e-11
 
-"""Earth-Moon CR3BP(円制限3体問題)"""
-# Characteristic length of Earth-Moon CR3BP [m] (地球-月系の特性長さは地球と月間距離を用いる)
+"""Earth-Moon CR3BP"""
+# Characteristic length of Earth-Moon CR3BP [m] 
 chara_length_CR3BP = 3.8440e8 
-# Characteristic mass of Earth-Moon CR3BP [kg] (地球-月系の特性質量は地球と月の合算質量を用いる)
+# Characteristic mass of Earth-Moon CR3BP [kg] 
 chara_mass_CR3BP = M1 + M2
-# Characteristic time of Earth-Moon CR3BP [s] (地球-月系の特性時間は地球と月の公転周期を用いる)
+# Characteristic time of Earth-Moon CR3BP [s] 
 chara_time_CR3BP = sqrt(chara_length_CR3BP^3 / (G * chara_mass_CR3BP))
 # Mass ratio of Earth-Moon CR3BP [no unit]
 mu_EM = M2 / (M1 + M2)
 # Mean-motion of Earth-Moon CR3BP [1/s]
 N_CR3BP = sqrt(G * chara_mass_CR3BP / chara_length_CR3BP^3)
 
-"""Earth-Moon ER3BP(楕円制限3体問題)"""
+"""Earth-Moon ER3BP"""
 # Semimajor axis of Earth-Moon ER3BP [m]
 a = 3.8440e8
 # Mean-motion of Earth-Moon ER3BP [1/s]
@@ -63,7 +64,7 @@ N_ER3BP = sqrt(G * (M1 + M2) / (a^3))
 # Eccentricity of Earth-Moon ER3BP [no unit]
 e = 0.0549 
 
-"""Earth-Moon-Sun BCR4BP(二重円制限4体問題)"""
+"""Earth-Moon-Sun BCR4BP"""
 # Characteristic length of the Sun-B1 [m] 
 chara_length_SB1 = 1.4960e11
 # Characteristic mass of the Sun-B1 [kg] 
@@ -76,7 +77,7 @@ m_S = M_S / (M1 + M2)
 a_S = chara_length_SB1 / chara_length_CR3BP
 # Nondimensional Sun angular velocity [1/s]
 omega_S = sqrt((1 + m_S) / (a_S^3)) - 1
-# Initial phase angle of the Sun-B1 [rad]（正しいかのちに確認）
+# Initial phase angle of the Sun-B1 [rad]
 theta_S0 = π 
 # Mass ratio of the Sun-B1 [no unit]
 mu_SB1 = (M1 + M2) / (M1 + M2 + M_S)
@@ -84,11 +85,11 @@ mu_SB1 = (M1 + M2) / (M1 + M2 + M_S)
 a_EM = chara_length_CR3BP / chara_length_SB1
 # nondimensional Moon angular velocity [no unit]
 omega_M = chara_time_SB1 / chara_time_CR3BP - 1
-# Initial phase angle of Earth-Moon [rad]（正しいかのちに確認）
+# Initial phase angle of Earth-Moon [rad]
 theta_M0 = 0
 
 """L2 Lyapunov orbit in Earth-Moon CR3BP"""
-# Initial Condition （datファイルから読み取るようにする。）.m→.datで1列目が時間、2~7がx,y,z...
+# Initial Condition 
 t_n_CR3BP = 3.467622949281189
 x_n_CR3BP = [1.102866098413080; 0.0; 0.0; 0.0; 0.259155907029058; 0.0]
 
@@ -107,8 +108,8 @@ sol1 = solve(prob1, Vern7(), abstol=1e-14, reltol=1e-14)
 save_file_name1 = "Ex1_CR3BP_x0=$(x0_CR3BP[1])_vy0=$(x0_CR3BP[5])_t=$(t_CR3BP)"
 save_file_name1 = replace(save_file_name1, "." => ",")
 
-fun_make_fig_2D_orbit(sol1[1, :], sol1[2, :], "x", "y", 2, 20, save_file_name1, mu_EM)
-fun_save_data(sol1.t, sol1.u, save_file_name1)
+fun_make_fig_2D_orbit(sol1[1, :], sol1[2, :], "x", "y", 2, 20, save_dir, save_file_name1, mu_EM)
+fun_save_data(sol1.t, sol1.u, save_dir, save_file_name1)
 
 """trajectory in Earth-Moon ER3BP"""
 # Orbital Period of ER3BP
@@ -149,8 +150,8 @@ sol2 = solve(prob2, Vern7(), abstol=1e-14, reltol=1e-14)
 save_file_name2 = "Ex1_ER3BP_x0=$(x0_ER3BP[1])_vy0=$(x0_ER3BP[5])_t=$(t_ER3BP)"
 save_file_name2 = replace(save_file_name2, "." => ",")
 
-fun_make_fig_2D_orbit(sol2[1, :], sol2[2, :], "x", "y", 2, 20, save_file_name2, mu_EM)
-fun_save_data(sol2.t, sol2.u, save_file_name2)
+fun_make_fig_2D_orbit(sol2[1, :], sol2[2, :], "x", "y", 2, 20, save_dir, save_file_name2, mu_EM)
+fun_save_data(sol2.t, sol2.u, save_dir, save_file_name2)
 
 """trajectory in Earth-Moon_Sun BCR4BP in the Earth-Moon rotating frame"""
 s# Define the integration time for the BCR4BP
@@ -170,8 +171,8 @@ sol3 = solve(prob3, Vern7(), abstol=1e-14, reltol=1e-14)
 save_file_name3 = "Ex1_BCR4BP_EMS_x0=$(x0_ER3BP[1])_vy0=$(x0_ER3BP[5])_t=$(t_BCR4BP)"
 save_file_name3 = replace(save_file_name3, "." => ",")
 
-fun_make_fig_2D_orbit(sol3[1, :], sol3[2, :], "x", "y", 2, 20, save_file_name3, mu_EM)
-fun_save_data(sol3.t, sol3.u, save_file_name3)
+fun_make_fig_2D_orbit(sol3[1, :], sol3[2, :], "x", "y", 2, 20, save_dir, save_file_name3, mu_EM)
+fun_save_data(sol3.t, sol3.u, save_dir, save_file_name3)
 
 """trajectory in Earth-Moon_Sun BCR4BP in the Sun-B1 rotating frame"""
 # Define angle range
@@ -219,10 +220,15 @@ save_file_name4 = replace(save_file_name4, "." => ",")
 fig4 = Figure(size = (800, 600))
 
 ax4 = Axis(fig4[1, 1],
-    xlabel = L"x \mathrm{[-]}", ylabel = L"y \mathrm{[-]}",
+    xlabel = "x [-]", ylabel = "y [-]",
     aspect = DataAspect(),
     xlabelsize = 20, ylabelsize = 20,
-    xticklabelsize = 20, yticklabelsize = 20)
+    xticklabelsize = 20, yticklabelsize = 20,
+    xlabelfont = font,
+    ylabelfont = font,
+    xticklabelfont = font,
+    yticklabelfont = font
+)
 
 # Earth and Moon trajectories (if defined)
 lines!(ax4, x_moon, y_moon, color = "#EDB120", label = "Moon Orbit")
@@ -232,9 +238,9 @@ scatter!(ax4, [sol4[1, 1]], [sol4[2, 1]], color = "#0072BD", markersize = 10, la
 # Spacecraft orbit
 lines!(ax4, sol4[1, :], sol4[2, :], color = "#0072BD", linewidth = 2, label = "Orbit")
 # Legend
-fig4[1, 2] = Legend(fig4, ax4, "Legend", orientation = :vertical)
+fig4[1, 2] = Legend(fig4, ax4, "Legend", orientation = :vertical, labelfont = font)
 # Save figure
-save(joinpath("./Example/Figure/", save_file_name4 * ".png"), fig4)
+save(joinpath(save_dir, save_file_name4 * ".png"), fig4)
 fig4
 
-fun_save_data(sol4.t, sol4.u, save_file_name4)
+fun_save_data(sol4.t, sol4.u, save_dir, save_file_name4)
