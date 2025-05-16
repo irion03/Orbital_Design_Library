@@ -11,7 +11,7 @@ using Printf
 # Function loading
 current_dir = pwd()
 
-functions_dir = normpath(joinpath(current_dir, ".", "Functions"))
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -28,6 +28,13 @@ else
     println("Error: Functions directory not found at ", functions_dir)
 end
 
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_dir = "../Example/Figure/"
+
 # Retrieving Parameters for the Sun-Earth Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
 # Calculation of Lagrange points
@@ -38,8 +45,8 @@ x0 = [0.9889 0 0 0 0.008375 0]'
 t0 = 2
 
 # Initial conditions for halo orbit
-x0 = [0.9919, 0, 0.002223, 0, -0.01014, 0]
-t0 = pi / 2
+#x0 = [0.9919, 0, 0.002223, 0, -0.01014, 0]
+#t0 = pi / 2
 
 if x0[3] == 0
 	Lyapunov = true;
@@ -59,7 +66,7 @@ sol_init = solve(prob, Vern7(), abstol=3e-14, reltol=1e-14)
 # Maximum number of iterations for differential correction
 iteration_max = 100
 # Convergence threshold
-threshold = 1e-12
+threshold = 1e-11
 
 # Correction
 for i in 1:iteration_max
@@ -97,18 +104,19 @@ for i in 1:iteration_max
     t0 = t_n
 end
 
-# Save directory
-save_dir = "./Example/Figure/"
-
 # Figure
 fig1 = Figure(size=(800, 600))
 
 if Lyapunov 
-    ax = Axis3(fig1[1,1], xlabel=L"x\mathrm{[-]}", ylabel=L"y\mathrm{[-]}", zlabel=L"z\mathrm{[-]}", azimuth = -pi/2, elevation = pi/2)
+    ax = Axis3(fig1[1,1], xlabel="x[-]", ylabel="y[-]", zlabel=L"z[-]", azimuth = -pi/2, elevation = pi/2, 
+        xlabelfont = font, ylabelfont = font, zlabelfont = font, xticklabelfont = font, yticklabelfont = font, zticklabelfont = font
+    )
     ax.zlabelvisible = false
     ax.zticklabelsvisible = false
   else
-    ax = Axis3(fig1[1,1], xlabel=L"x\mathrm{[-]}", ylabel=L"y\mathrm{[-]}", zlabel=L"z\mathrm{[-]}", azimuth = pi/9, elevation = pi/6)
+    ax = Axis3(fig1[1,1], xlabel=L"x[-]", ylabel=L"y[-]", zlabel=L"z[-]", azimuth = pi/9, elevation = pi/6,
+        xlabelfont = font, ylabelfont = font, zlabelfont = font, xticklabelfont = font, yticklabelfont = font, zticklabelfont = font
+    )
 end
 
 # Initial orbit (red line)
@@ -128,14 +136,14 @@ corrected = GLMakie.scatter!(ax, [sol[1,1]], [sol[2,1]], [sol[3,1]],
 # Plot Lagrange points
 L1_point = GLMakie.scatter!(ax, [L1[1]], [L1[2]], [L1[3]], color=:black, marker=:star6, markersize=15)
 
-Legend(fig1[1, 2], [iniial, corrected, L1_point], ["iniial", "corrected", "L1"])
+Legend(fig1[1, 2], [iniial, corrected, L1_point], ["iniial", "corrected", "L1"], labelfont = font)
 
 f1_name = "Ex4_differential_correction_mu=$(mu)_x0=$(x0[1])_z0=$(x0[3])_ydot0=$(x0[5])_t0=$(t0)"
 f1_name = replace(f1_name, "." => ",")  
 save_path = joinpath(save_dir, f1_name * ".png")  
 save(save_path, fig1)  
 
-fun_save_data(sol.t, sol.u, f1_name)
+fun_save_data(sol.t, sol.u, save_dir, f1_name)
 
 display(fig1)  
 
@@ -144,7 +152,7 @@ X0 = vcat(x_n, reshape(Matrix(I, 6, 6), :))
 tspan = (0.0, 2 * t_n)
 
 prob = ODEProblem(fun_stm_cr3bp!, X0, tspan, parameter)
-sol = solve(prob, Vern7())
+sol = solve(prob, Vern7(), abstol=3e-14, reltol=1e-14)
 
 monodromy = reshape(sol.u[end][7:end], 6, 6)
 D, V = eigen(monodromy)
@@ -159,29 +167,33 @@ eigenvalues = D
 
 # Plot of the unit circle and eigenvalues
 fig2 = Figure()
-ax1 = Axis(fig2[1, 1], xlabel="real part", ylabel="imaginary part", aspect=1)
+ax1 = Axis(fig2[1, 1], xlabel="real part", ylabel="imaginary part", aspect=1,
+    xlabelfont = font, ylabelfont = font, xticklabelfont = font, yticklabelfont = font
+)
 lines!(ax1, x_circle, y_circle, color=:black)
 
 scatter_plot = GLMakie.scatter!(ax1, real.(eigenvalues), imag.(eigenvalues), color=:blue, markersize=10, marker=:circle)
-Legend(fig2[1, 2], [scatter_plot], ["eigenvalue"])
+Legend(fig2[1, 2], [scatter_plot], ["eigenvalue"], labelfont = font)
 
 f2_name = "Ex4_monodromy_mu=$(mu)_x0=$(x0[1])_z0=$(x0[3])_ydot0=$(x0[5])_t0=$(t0)"
 f2_name = replace(f2_name, "." => ",")
 save_path = joinpath(save_dir, f2_name * ".png")
 save(save_path, fig2)
 
-#display(fig2)
+display(fig2)
 
 # Plot with restricted coordinate range
 fig3 = Figure()
-ax2 = Axis(fig3[1, 1], xlabel="real part", ylabel="imaginary part", aspect=1, limits=(-1.5, 1.5, -1.5, 1.5))
+ax2 = Axis(fig3[1, 1], xlabel="real part", ylabel="imaginary part", aspect=1, limits=(-1.5, 1.5, -1.5, 1.5), 
+    xlabelfont = font, ylabelfont = font, xticklabelfont = font, yticklabelfont = font
+)
 lines!(ax2, x_circle, y_circle, color=:black)
 GLMakie.scatter!(ax2, real.(eigenvalues), imag.(eigenvalues), color=:blue, markersize=10, marker=:circle)
-Legend(fig3[1, 2], [scatter_plot], ["eigenvalue"])
+Legend(fig3[1, 2], [scatter_plot], ["eigenvalue"], labelfont = font)
 
 f3_name = "Ex4_monodromy_origin_mu=$(mu)_x0=$(x0[1])_z0=$(x0[3])_ydot0=$(x0[5])_t0=$(t0)"
 f3_name = replace(f3_name, "." => ",")
 save_path = joinpath(save_dir, f3_name * ".png")
 save(save_path, fig3)
 
-#display(fig3)
+display(fig3)
