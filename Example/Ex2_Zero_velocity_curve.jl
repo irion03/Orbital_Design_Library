@@ -10,7 +10,7 @@ using CairoMakie
 current_dir = pwd()
 
 # Function loading
-functions_dir = normpath(joinpath(current_dir, ".", "Functions"))
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -26,6 +26,13 @@ if isdir(functions_dir)
 else
     println("Error: Functions directory not found at ", functions_dir)
 end
+
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_dir = "../Example/Figure/"
 
 # Retrieving Parameters for the Earth-Moon Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(2)
@@ -49,9 +56,14 @@ C = 2 .* U
 fig = Figure(size=(600, 600))
 
 # Create an Axis for the Plot
-ax = Axis(fig[1, 1], aspect = DataAspect(), xlabel = L"x\mathrm{[-]}", ylabel = L"y\mathrm{[-]}",
+ax = Axis(fig[1, 1], aspect = DataAspect(), xlabel = "x [-]", ylabel = "y [-]",
     xlabelsize = 16, ylabelsize = 16,
-    xticklabelsize = 16, yticklabelsize = 16)
+    xticklabelsize = 16, yticklabelsize = 16,
+    xlabelfont = font,
+    ylabelfont = font,
+    xticklabelfont = font,
+    yticklabelfont = font
+)
 
 # Define contour levels
 Clevels = [3.000, 3.020, 3.040, 3.060, 3.080, 3.100, 3.120, 3.140, 3.160, 3.180, 3.200, 3.220, 3.240, 3.260, 3.280, 3.300]
@@ -72,12 +84,15 @@ GLMakie.scatter!(ax, [L1[1], L2[1], L3[1], L4[1], L5[1]], [L1[2], L2[2], L3[2], 
          color=:black, marker=:star5, markersize=10)
 
 # Colorbar (ensures colors are mapped correctly)
-Colorbar(fig[1, 2], colormap=:jet, limits=(minimum(Clevels), maximum(Clevels)), ticks=Clevels, label = "Jacobi constant [-]")
+Colorbar(fig[1, 2], colormap=:jet, limits=(minimum(Clevels), maximum(Clevels)), ticks=Clevels, 
+    label = "Jacobi constant [-]", 
+    labelfont = font, 
+    ticklabelfont = font
+)
 
 display(fig)
 
 # Save figure
 save_file_name = "Ex2_Zero_Velocity_Curve_mu$(mu)"
-save_path = joinpath("./Example/Figure/", save_file_name * ".png")
+save_path = joinpath(save_dir, save_file_name * ".png")
 save(save_path, fig)
-
