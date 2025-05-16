@@ -10,7 +10,8 @@ using Printf
 using Interpolations
 
 current_dir = pwd()
-functions_dir = normpath(joinpath(current_dir, "Functions"))
+
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -27,20 +28,29 @@ else
     println("Error: Functions directory not found at ", functions_dir)
 end
 
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_fig_dir = "Figure/"
+
 # Retrieving parameters for the Earth-Moon Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
 dim_L = a_1
 # Compute Lagrange points
 L1, L2, L3, L4, L5 = fun_libration_points(mu)
 
-options_ODE = Dict(:reltol => 3e-14, :abstol => 1e-14)
 iteration_max = 100
 threshold = 1e-10
 delta = 2e-6
 count = 0
+# Max number of total steps
 count_max = 4000
+# Plot update interval
 plot_interval = 200
 
+# Jacobi constant range (for colormap)
 Jacobi_min = 3.000040465479221
 Jacobi_max = 3.000881506800496
 
@@ -59,7 +69,8 @@ x0 = [1.01003168694194, 0, 0, 0, 8.61411407047802e-6, 0]
 t0 = 1.47271346920646
 
 fig = Figure(size = (800, 600))
-ax = Axis(fig[1, 1], xlabel=L"x\mathrm{[km]}", ylabel=L"y\mathrm{[km]}", aspect = DataAspect())
+ax = Axis(fig[1, 1], xlabel="x[km]", ylabel="y[km]", aspect = DataAspect(), xlabelfont=font, ylabelfont=font,
+        xticklabelfont=font, yticklabelfont=font)
 
 while true
     global count
@@ -105,7 +116,7 @@ while true
 
         # Normalize C into the range [0, 1]
         norm_val = (C - Jacobi_min) / (Jacobi_max - Jacobi_min)
-        local rgb = color_grad[norm_val]  # Access color via indexing, not function call
+        local rgb = color_grad[norm_val]  
 
         lines!(ax, sol[1, :] * dim_L, sol[2, :] * dim_L, color = rgb)
     end
@@ -124,8 +135,13 @@ scatter!(ax, [(1 - mu) * dim_L], [0], color = :black, marker = :star6, markersiz
 
 # Add colorbar
 cb = Colorbar(fig[1, 2], colormap = color_grad, limits = (Jacobi_min, Jacobi_max),
-              label = "Jacobi constant [-]", width = 20)
+              label = "Jacobi constant [-]", width = 20, labelfont = font, ticklabelfont = font
+    )
 
-fig[1, 1] = ax
+#f1_name = "Ex9_natural_parameter_continuation_mu=$(mu)_x0=$(x0[1])_ydot0=$(x0[5])_t0=$(t0)_threshold=$(threshold)_delta=$(delta)_count_max=$(count_max)_plot_interval=$(plot_interval)"
+f1_name = "Ex9_natural_parameter_continuation_mu=$(mu)_x0=$(x0[1])_ydot0=$(x0[5])_t0=$(t0)_threshold=$(threshold)"
+f1_name = replace(f1_name, "." => ",")
+save_path = joinpath(save_fig_dir, f1_name * ".png")
+save(save_path, fig)
 
 display(fig)

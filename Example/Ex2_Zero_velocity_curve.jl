@@ -31,8 +31,8 @@ end
 t0 = time()  
 # font setting
 font = "Times New Roman"
-# Save directory
-save_dir = "../Example/Figure/"
+# Save Figure directory
+save_fig_dir = "Figure/"
 
 # Retrieving Parameters for the Earth-Moon Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(2)
@@ -94,5 +94,6 @@ display(fig)
 
 # Save figure
 save_file_name = "Ex2_Zero_Velocity_Curve_mu$(mu)"
-save_path = joinpath(save_dir, save_file_name * ".png")
+save_path = joinpath(save_fig_dir, save_file_name * ".png")
 save(save_path, fig)
+

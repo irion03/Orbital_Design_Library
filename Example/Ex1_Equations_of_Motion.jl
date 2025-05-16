@@ -31,8 +31,10 @@ end
 t0 = time()  
 # font setting
 font = "Times New Roman"
-# Save directory
-save_dir = "../Example/Figure/"
+# Save Figure directory
+save_fig_dir = "Figure/"
+# Save dat directory
+save_dat_dir = "Output_data/"
 
 """Initial conditions and constants"""
 # Mass of Sun [kg]
@@ -108,8 +110,8 @@ sol1 = solve(prob1, Vern7(), abstol=1e-14, reltol=1e-14)
 save_file_name1 = "Ex1_CR3BP_x0=$(x0_CR3BP[1])_vy0=$(x0_CR3BP[5])_t=$(t_CR3BP)"
 save_file_name1 = replace(save_file_name1, "." => ",")
 
-fun_make_fig_2D_orbit(sol1[1, :], sol1[2, :], "x", "y", 2, 20, save_dir, save_file_name1, mu_EM)
-fun_save_data(sol1.t, sol1.u, save_dir, save_file_name1)
+fun_make_fig_2D_orbit(sol1[1, :], sol1[2, :], "x", "y", 2, 20, save_fig_dir, save_file_name1, mu_EM)
+fun_save_data(sol1.t, sol1.u, save_dat_dir, save_file_name1)
 
 """trajectory in Earth-Moon ER3BP"""
 # Orbital Period of ER3BP
@@ -150,8 +152,8 @@ sol2 = solve(prob2, Vern7(), abstol=1e-14, reltol=1e-14)
 save_file_name2 = "Ex1_ER3BP_x0=$(x0_ER3BP[1])_vy0=$(x0_ER3BP[5])_t=$(t_ER3BP)"
 save_file_name2 = replace(save_file_name2, "." => ",")
 
-fun_make_fig_2D_orbit(sol2[1, :], sol2[2, :], "x", "y", 2, 20, save_dir, save_file_name2, mu_EM)
-fun_save_data(sol2.t, sol2.u, save_dir, save_file_name2)
+fun_make_fig_2D_orbit(sol2[1, :], sol2[2, :], "x", "y", 2, 20, save_fig_dir, save_file_name2, mu_EM)
+fun_save_data(sol2.t, sol2.u, save_dat_dir, save_file_name2)
 
 """trajectory in Earth-Moon_Sun BCR4BP in the Earth-Moon rotating frame"""
 s# Define the integration time for the BCR4BP
@@ -171,8 +173,8 @@ sol3 = solve(prob3, Vern7(), abstol=1e-14, reltol=1e-14)
 save_file_name3 = "Ex1_BCR4BP_EMS_x0=$(x0_ER3BP[1])_vy0=$(x0_ER3BP[5])_t=$(t_BCR4BP)"
 save_file_name3 = replace(save_file_name3, "." => ",")
 
-fun_make_fig_2D_orbit(sol3[1, :], sol3[2, :], "x", "y", 2, 20, save_dir, save_file_name3, mu_EM)
-fun_save_data(sol3.t, sol3.u, save_dir, save_file_name3)
+fun_make_fig_2D_orbit(sol3[1, :], sol3[2, :], "x", "y", 2, 20, save_fig_dir, save_file_name3, mu_EM)
+fun_save_data(sol3.t, sol3.u, save_dat_dir, save_file_name3)
 
 """trajectory in Earth-Moon_Sun BCR4BP in the Sun-B1 rotating frame"""
 # Define angle range
@@ -240,7 +242,7 @@ lines!(ax4, sol4[1, :], sol4[2, :], color = "#0072BD", linewidth = 2, label = "O
 # Legend
 fig4[1, 2] = Legend(fig4, ax4, "Legend", orientation = :vertical, labelfont = font)
 # Save figure
-save(joinpath(save_dir, save_file_name4 * ".png"), fig4)
+save(joinpath(save_fig_dir, save_file_name4 * ".png"), fig4)
 fig4
 
-fun_save_data(sol4.t, sol4.u, save_dir, save_file_name4)
+fun_save_data(sol4.t, sol4.u, save_dat_dir, save_file_name4)

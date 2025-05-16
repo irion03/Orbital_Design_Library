@@ -32,8 +32,10 @@ end
 t0 = time()  
 # font setting
 font = "Times New Roman"
-# Save directory
-save_dir = "../Example/Figure/"
+# Save Figure directory
+save_fig_dir = "Figure/"
+# Save dat directory
+save_dat_dir = "Output_data/"
 
 # Retrieving Parameters for the Sun-Earth Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
@@ -140,10 +142,10 @@ Legend(fig1[1, 2], [iniial, corrected, L1_point], ["iniial", "corrected", "L1"],
 
 f1_name = "Ex4_differential_correction_mu=$(mu)_x0=$(x0[1])_z0=$(x0[3])_ydot0=$(x0[5])_t0=$(t0)"
 f1_name = replace(f1_name, "." => ",")  
-save_path = joinpath(save_dir, f1_name * ".png")  
+save_path = joinpath(save_fig_dir, f1_name * ".png")  
 save(save_path, fig1)  
 
-fun_save_data(sol.t, sol.u, save_dir, f1_name)
+fun_save_data(sol.t, sol.u, save_dat_dir, f1_name)
 
 display(fig1)  
 
@@ -177,7 +179,7 @@ Legend(fig2[1, 2], [scatter_plot], ["eigenvalue"], labelfont = font)
 
 f2_name = "Ex4_monodromy_mu=$(mu)_x0=$(x0[1])_z0=$(x0[3])_ydot0=$(x0[5])_t0=$(t0)"
 f2_name = replace(f2_name, "." => ",")
-save_path = joinpath(save_dir, f2_name * ".png")
+save_path = joinpath(save_fig_dir, f2_name * ".png")
 save(save_path, fig2)
 
 display(fig2)
@@ -193,7 +195,7 @@ Legend(fig3[1, 2], [scatter_plot], ["eigenvalue"], labelfont = font)
 
 f3_name = "Ex4_monodromy_origin_mu=$(mu)_x0=$(x0[1])_z0=$(x0[3])_ydot0=$(x0[5])_t0=$(t0)"
 f3_name = replace(f3_name, "." => ",")
-save_path = joinpath(save_dir, f3_name * ".png")
+save_path = joinpath(save_fig_dir, f3_name * ".png")
 save(save_path, fig3)
 
 display(fig3)

@@ -31,8 +31,10 @@ end
 t0 = time()  
 # font setting
 font = "Times New Roman"
-# Save directory
-save_dir = "../Example/Figure/"
+# Save Figure directory
+save_fig_dir = "Figure/"
+# Save dat directory
+save_dat_dir = "Output_data/"
 
 """Zero_velocity_curve"""
 # Retrieving Parameters for the Earth-Moon Circular Restricted Three-Body Problem
@@ -115,12 +117,12 @@ for (Li, sol_sp, sol_sm, sol_up, sol_um, Ci, tf, label) in
     # Save the figure
     local save_file_name = "Ex3_manifold_of_$(label)_mu=$(mu)_C=$(Ci)_tf=$(tf)"
     local save_file_name = replace(save_file_name, "." => ",")
-    local save_path = joinpath(save_dir, save_file_name * ".png")
+    local save_path = joinpath(save_fig_dir, save_file_name * ".png")
     save(save_path, fig)
 
     # Save trajectory data
-    fun_save_data(sol_sp.t, sol_sp.u, save_dir, save_file_name * "_stable_plus")
-    fun_save_data(sol_sm.t, sol_sm.u, save_dir, save_file_name * "_stable_minus")
+    fun_save_data(sol_sp.t, sol_sp.u, save_dat_dir, save_file_name * "_stable_plus")
+    fun_save_data(sol_sm.t, sol_sm.u, save_dat_dir, save_file_name * "_stable_minus")
 
     display(fig)
 end

@@ -14,9 +14,9 @@ using Interpolations
 GLMakie.activate!()
 #GLMakie.inline!(false)
 
-# --- Load functions ---
+# Load functions
 current_dir = pwd()
-functions_dir = normpath(joinpath(current_dir, "Functions"))
+functions_dir = normpath(joinpath(current_dir, "..", "Functions"))
 
 if isdir(functions_dir)
     for file in readdir(functions_dir)
@@ -33,6 +33,13 @@ else
     println("Error: Functions directory not found at ", functions_dir)
 end
 
+# Start timer
+t0 = time()  
+# font setting
+font = "Times New Roman"
+# Save directory
+save_fig_dir = "Figure/"
+
 # Retrieve parameters for the Earth-Moon Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
 dim_L = a_1
@@ -47,9 +54,9 @@ threshold     = 1e-10
 # Step scale for pseudo-arclength continuation
 scale         = 1e-4 
 # Max number of total steps
-count_max     = 100
+count_max     = 400
 # Plot update interval
-plot_interval = 8400 
+plot_interval = 100
 
 # Jacobi constant range (for colormap)
 Jacobi_min = 3.000212571920089
@@ -88,7 +95,9 @@ t0_corrected[1]   = t01_ast
 
 # Create figure and 3D axis 
 fig = Figure(size = (1000, 600))
-ax = Axis3(fig[1,1], aspect = (1,1,1), xlabel=L"x\mathrm{[km]}", ylabel=L"y\mathrm{[km]}", zlabel=L"z\mathrm{[km]}")
+ax = Axis3(fig[1,1], aspect = (1,1,1), xlabel="x[km]", ylabel="y[km]", zlabel="z[km]",
+        xlabelfont=font, ylabelfont=font, xticklabelfont=font, yticklabelfont=font)
+
 ax.xticks = 1.48e8:0.01e8:1.52e8
 
 rgb = Interp_c[Jacobi_arr[1]]
@@ -107,9 +116,7 @@ for i in 1:count_max
     # Differential correction loop (inner iteration until convergence)
     for j in 1:iteration_max
         # Get corrected initial state, period, and Jacobi constant C from correction function
-
         global x02_ast, t02_ast, C, G = fun_differential_correction_cr3bp_PAC(x01_ast, t01_ast, x02, t02, scale, delta, mu)
-
         global prob = ODEProblem(fun_cr3bp!, x02_ast, (0.0, 2*t02_ast), mu)
         global sol = solve(prob, Vern7(), abstol=1e-14, reltol=1e-14)
 
@@ -174,15 +181,12 @@ xlims!(ax, (xlim_min, xlim_max))
 ylims!(ax, (ylim_min, ylim_max))
 zlims!(ax, (zlim_min, zlim_max))
 
-cbar = Colorbar(fig[1, 2],
-    colormap = :jet,
-    limits = (Jacobi_min, Jacobi_max),
-    label = "Jacobi constant [-]",
-    labelsize = 15,
-)
+cbar = Colorbar(fig[1, 2],colormap = :jet,limits = (Jacobi_min, Jacobi_max),
+    label = "Jacobi constant [-]", labelsize = 15,labelfont = font, ticklabelfont = font
+    )
 cbar.ticks = LinRange(Jacobi_min, Jacobi_max, 6)
 
-leg = axislegend(ax, [f1_p1, f1_p2], ["L_2", "Earth"], position = :lt)
+leg = axislegend(ax, [f1_p1, f1_p2], ["L_2", "Earth"], position = :lt, labelfont = font)
 
 display(fig)
 
@@ -196,9 +200,6 @@ f1_name = "Ex10_mu=$(round(mu, sigdigits=3))" *
           "_pi=$(plot_interval)"
 
 
-# Save directory
-save_dir = "./Example/Figure/"
-
 f1_name = replace(f1_name, "." => ",") 
-save_path = joinpath(save_dir, f1_name*".png")
+save_path = joinpath(save_fig_dir, f1_name*".png")
 save(save_path, fig)

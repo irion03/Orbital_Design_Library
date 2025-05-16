@@ -33,7 +33,7 @@ t0 = time()
 # font setting
 font = "Times New Roman"
 # Save directory
-save_dir = "../Example/Figure/"
+save_fig_dir = "Figure/"
 
 # Retrieving Parameters for the Earth-moon Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
@@ -215,7 +215,7 @@ Legend(fig1[1, 2], [[initial_guess1]], ["Initial guess"], labelfont = font)
 
 f1_name = "Ex6_initial_guess_mu=$(mu)"
 f1_name = replace(f1_name, "." => ",") 
-save_path = joinpath(save_dir, f1_name * ".png")
+save_path = joinpath(save_fig_dir, f1_name * ".png")
 save(save_path, fig1)
 
 fig2 = Figure(size = (800, 600))
@@ -254,7 +254,7 @@ Legend(fig2[1, 2], [[initial_guess1], [multiple_shooting_plots[1]]],
 
 f2_name = "Ex6_multiple_shooting_mu=$(mu)"
 f2_name = replace(f2_name, "." => ",") 
-save_path = joinpath(save_dir, f2_name * ".png")
+save_path = joinpath(save_fig_dir, f2_name * ".png")
 save(save_path, fig2)
 
 display(fig2)

@@ -35,7 +35,7 @@ t0 = time()
 # font setting
 font = "Times New Roman"
 # Save directory
-save_dir = "../Example/Figure/"
+save_fig_dir = "Figure/"
 
 # Retrieving Parameters for the Sun-Earth Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(1)
@@ -216,14 +216,14 @@ if Lyapunov
     # Zero velocity curve
     contourf!(ax, x_range, y_range, C; levels=[minimum(C), C_xn], colormap=[:gray])
     contour!(ax, x_range, y_range, C; levels=[C_xn], linewidth=1.5, color=:black)
-    save_path = joinpath(save_dir, f1_name * ".png")
+    save_path = joinpath(save_fig_dir, f1_name * ".png")
     save(save_path, fig)
 else
     ax.azimuth = pi/2
     ax.elevation = pi
     ax.ylabel = ""
     ax.yticklabelsvisible=false
-    save_path = joinpath(save_dir, f1_name * "_xz.png")
+    save_path = joinpath(save_fig_dir, f1_name * "_xz.png")
     save(save_path, fig)
     ax.azimuth = 0.0
     ax.elevation = 0.0
@@ -231,7 +231,7 @@ else
     ax.yticklabelsvisible=true
     ax.xlabel = ""
     ax.xticklabelsvisible=true
-    save_path = joinpath(save_dir, f1_name * "_yz.png")
+    save_path = joinpath(save_fig_dir, f1_name * "_yz.png")
     save(save_path, fig)
     # Zero velocity curve
     contourf!(ax, x_range, y_range, C; levels=[minimum(C), C_xn], colormap=[:gray])
@@ -242,7 +242,7 @@ else
     ax.xticklabelsvisible=true
     ax.zlabel = ""
     ax.zticklabelsvisible=false
-    save_path = joinpath(save_dir, f1_name * "_xy.png")
+    save_path = joinpath(save_fig_dir, f1_name * "_xy.png")
     save(save_path, fig)
 end
 

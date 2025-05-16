@@ -35,7 +35,7 @@ t0 = time()
 # font setting
 font = "Times New Roman"
 # Save directory
-save_dir = "../Example/Figure/"
+save_fig_dir = "Figure/"
 
 # Retrieving Parameters for the Sun-Jupiter Circular Restricted Three-Body Problem
 mu, a_1, a_s, w_1 = fun_cr3bp_parameter(6)
