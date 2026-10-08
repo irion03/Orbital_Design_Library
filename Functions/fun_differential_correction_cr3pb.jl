@@ -1,6 +1,7 @@
 function fun_differential_correction_cr3bp(x0, t0, mu)
     # Initial state and state transition matrix
     X0 = vcat(x0, reshape(I(6), 36))
+    # reshapeによって、1次元配列にし、x0との列幅を合わせる
     tspan = (0.0, t0)
     parameter = (mu)
     
